@@ -1,6 +1,7 @@
 package com.kalidratorma;
 
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.http.HttpClientTransportOverHTTP;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.proxy.ProxyServlet;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,27 +56,46 @@ public class CustomProxyServlet extends ProxyServlet {
         return httpClient;
     }
 
-    /**
-     * Rewrites the target URL of the incoming request to use HTTPS if the host is in the set of HTTPS hosts.
-     *
-     * @param request The incoming request.
-     * @return The rewritten URL.
-     */
+//    /**
+//     * Rewrites the target URL of the incoming request to use HTTPS if the host is in the set of HTTPS hosts.
+//     *
+//     * @param request The incoming request.
+//     * @return The rewritten URL.
+//     */
+//    @Override
+//    protected String rewriteTarget(HttpServletRequest request) {
+//        String rewrittenUrl = super.rewriteTarget(request);
+//        if (rewrittenUrl == null) {
+//            return null;
+//        }
+//
+//        URI uri = URI.create(rewrittenUrl);
+//        if (HTTPS_HOSTS.contains(uri.getHost())) {
+//            String httpsUrl = rewrittenUrl.replaceFirst("^http:", "https:");
+//            return httpsUrl;
+//        } else {
+//            return rewrittenUrl;
+//        }
+//    }
+
     @Override
-    protected String rewriteTarget(HttpServletRequest request) {
-        String rewrittenUrl = super.rewriteTarget(request);
-        if (rewrittenUrl == null) {
-            return null;
+    protected void sendProxyRequest(HttpServletRequest clientRequest, HttpServletResponse proxyResponse, Request proxyRequest) {
+        String host = clientRequest.getServerName().toLowerCase();
+        if (HTTPS_HOSTS.contains(host)) {
+            URI rewrittenURI = null;
+            try {
+                rewrittenURI = new URI("https", null, host, clientRequest.getServerPort(), clientRequest.getRequestURI(), clientRequest.getQueryString(), null);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException("Invalid URI", e);
+            }
+            proxyRequest.scheme(rewrittenURI.getScheme());
+            proxyRequest.path(rewrittenURI.toString());
         }
 
-        URI uri = URI.create(rewrittenUrl);
-        if (HTTPS_HOSTS.contains(uri.getHost())) {
-            String httpsUrl = rewrittenUrl.replaceFirst("^http:", "https:");
-            return httpsUrl;
-        } else {
-            return rewrittenUrl;
-        }
+        super.sendProxyRequest(clientRequest, proxyResponse, proxyRequest);
     }
+
+
 
     /**
      * Forwards the incoming request to the target server, and logs the session key and website for HTTPS requests.
