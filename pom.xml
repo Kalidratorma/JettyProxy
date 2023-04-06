@@ -5,10 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.kalidratorma</groupId>
-    <artifactId>JettyPorxy</artifactId>
+    <artifactId>JettyProxy</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
         <repository>
             <id>eclipse</id>
             <url>https://repo.eclipse.org/content/repositories/jetty-releases/</url>
@@ -39,11 +43,11 @@
             <artifactId>jetty-client</artifactId>
             <version>${jetty.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.eclipse.jetty</groupId>-->
-<!--            <artifactId>jetty-http</artifactId>-->
-<!--            <version>${jetty.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-http</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.eclipse.jetty</groupId>-->
 <!--            <artifactId>jetty-https</artifactId>-->
@@ -63,6 +67,18 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-proxy</artifactId>
             <version>${jetty.version}</version>
+        </dependency>
+
+        <!-- Jetty HTTP/2 Client -->
+        <dependency>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>http2-client</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-io</artifactId>
+            <version>10.0.10</version>
         </dependency>
 
         <!-- Jetty SSL dependencies -->
